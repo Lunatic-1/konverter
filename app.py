@@ -11,11 +11,6 @@ Kebutuhan:
   - Tkinter (bawaan Python)
   - deep-translator (hanya untuk fitur terjemahan, perlu internet)
 
-Instalasi:
-  pip install deep-translator
-
-Menjalankan:
-  python konverter_app.py
 """
 
 import base64
