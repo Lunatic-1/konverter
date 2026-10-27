@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Konverter Teks, Biner & Aksara Jawa</title>
+  <meta name="description" content="Konverter online: Teks ke Biner, Hex, Base64, ASCII, transliterasi Aksara Jawa, dan penerjemah bahasa. Gratis dan langsung di browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d1117;
+      --bg2:        #161b22;
+      --bg3:        #21262d;
+      --border:     #30363d;
+      --text:       #e6edf3;
+      --text-muted: #8b949e;
+      --green:      #56d364;
+      --green-dim:  #2ea04326;
+      --green-mid:  #238636;
+      --teal:       #39d8c8;
+      --teal-dim:   #39d8c820;
+      --yellow:     #e3b341;
+      --yellow-dim: #bb800926;
+      --purple:     #bc8cff;
+      --purple-dim: #6e40c926;
+      --radius:     14px;
+      --radius-sm:  8px;
+      --shadow:     0 8px 32px rgba(0,0,0,.45);
+      --trans:      .18s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%, #0e3d2540 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, #1a1f3a40 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    header {
+      position: relative; z-index: 10;
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #161b22 0%, transparent 100%);
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+
+    .header-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-dim); border: 1px solid #2ea04355;
+      color: var(--green); font-size: .72rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #56d364 0%, #39d8c8 50%, #bc8cff 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2; margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted); font-size: .92rem; max-width: 520px; margin: 0 auto;
+    }
+
+    main {
+      position: relative; z-index: 1;
+      max-width: 960px; margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    .tabs {
+      display: flex; gap: 6px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px; flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font: 500 .9rem 'Inter', sans-serif;
+      padding: 10px 18px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      border-bottom: 2px solid transparent;
+      transition: color var(--trans), background var(--trans), border-color var(--trans);
+    }
+    .tab-btn:hover { color: var(--text); background: var(--bg3); }
+    .tab-btn.active {
+      color: var(--green); border-bottom-color: var(--green);
+      background: var(--green-dim);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px;
+      margin-bottom: 18px; box-shadow: var(--shadow);
+      transition: border-color var(--trans);
+    }
+    .card:hover { border-color: #444c56; }
+
+    .card-title {
+      font-size: .78rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--text-muted); margin-bottom: 14px;
+    }
+
+    .step-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .step-badge {
+      background: var(--green-dim); border: 1px solid #2ea04355;
+      color: var(--green); font-size: .72rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .step-title {
+      font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+
+    textarea, select {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font: 400 .9rem 'JetBrains Mono', monospace;
+      padding: 12px 14px; resize: vertical; outline: none;
+      transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    textarea:focus, select:focus {
+      border-color: var(--green); box-shadow: 0 0 0 3px var(--green-dim);
+    }
+    textarea { min-height: 110px; line-height: 1.6; }
+    select { height: 42px; cursor: pointer; font-family: 'Inter', sans-serif; }
+    select option { background: var(--bg3); }
+
+    .textarea-readonly {
+      background: #0d1117; color: #a5d6a7;
+      border-color: #2a3a2a;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 500 .88rem 'Inter', sans-serif; padding: 9px 18px;
+      border-radius: var(--radius-sm); border: 1px solid transparent;
+      cursor: pointer; transition: all var(--trans); white-space: nowrap;
+    }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--green-mid); border-color: #2ea043; color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: #2dba4e; box-shadow: 0 0 18px #2ea04355; }
+
+    .btn-secondary {
+      background: var(--bg3); border-color: var(--border); color: var(--text);
+    }
+    .btn-secondary:hover:not(:disabled) { background: #2d333b; border-color: #6e7681; }
+
+    .btn-teal {
+      background: var(--teal-dim); border-color: #39d8c855; color: var(--teal);
+    }
+    .btn-teal:hover:not(:disabled) { background: #39d8c835; box-shadow: 0 0 14px #39d8c840; }
+
+    .pill-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 500 .83rem 'Inter', sans-serif; padding: 8px 15px;
+      border-radius: 30px; border: 1.5px solid var(--border);
+      background: var(--bg3); color: var(--text-muted);
+      cursor: pointer; transition: all var(--trans);
+    }
+    .pill-btn:hover {
+      border-color: var(--green); color: var(--green);
+      background: var(--green-dim); transform: translateY(-1px);
+      box-shadow: 0 4px 12px #56d36425;
+    }
+
+    .btn-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+    }
+
+    .select-row {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .select-row label {
+      font-size: .82rem; color: var(--text-muted); white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .select-row select { width: auto; flex: 1; min-width: 160px; }
+
+    #status-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 8px 24px; font-size: .8rem;
+      display: flex; align-items: center; gap: 8px;
+      z-index: 100; backdrop-filter: blur(8px);
+    }
+    #status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    #status-text { color: var(--text-muted); font-family: 'Inter', sans-serif; }
+
+    #toast {
+      position: fixed; top: 24px; right: 24px;
+      background: var(--bg3); border: 1px solid var(--green);
+      color: var(--green); font-size: .85rem; font-weight: 500;
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      box-shadow: var(--shadow); z-index: 999;
+      opacity: 0; transform: translateY(-12px);
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    .keyboard-grid {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;
+    }
+    .key-btn {
+      min-width: 44px; height: 44px; padding: 0 8px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-size: 1.2rem; cursor: pointer;
+      transition: all var(--trans); display: flex;
+      align-items: center; justify-content: center;
+    }
+    .key-btn:hover {
+      background: var(--green-dim); border-color: var(--green);
+      color: var(--green); transform: scale(1.08);
+    }
+    .key-btn.sign { color: var(--teal); border-color: #39d8c840; }
+    .key-btn.sign:hover { background: var(--teal-dim); border-color: var(--teal); }
+    .key-section {
+      font-size: .7rem; color: var(--text-muted); width: 100%;
+      margin: 4px 0 2px; text-transform: uppercase; letter-spacing: .06em;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .spinner {
+      display: none; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.25);
+      border-top-color: currentColor;
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .char-count {
+      text-align: right; font-size: .72rem;
+      color: var(--text-muted); margin-top: 5px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    @media (max-width: 640px) {
+      .select-row { flex-direction: column; align-items: flex-start; }
+      .pill-btn { font-size: .78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">&#127807; Alat Pembelajaran Digital</div>
+  <h1>Konverter Teks, Biner &amp; Aksara Jawa</h1>
+  <p>Konversi teks, biner, hex, ASCII, Base64 &bull; Transliterasi Aksara Jawa &bull; Penerjemah Bahasa &mdash; semua langsung di browser.</p>
+</header>
+
+<main>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" id="tab-konversi" role="tab" onclick="switchTab('konversi')">&#128290; Konversi Kode</button>
+    <button class="tab-btn" id="tab-terjemah" role="tab" onclick="switchTab('terjemah')">&#127760; Terjemahan</button>
+    <button class="tab-btn" id="tab-aksara" role="tab" onclick="switchTab('aksara')">&#128220; Aksara Jawa</button>
+  </div>
+
+  <!-- =================== TAB 1 — KONVERSI =================== -->
+  <div class="tab-panel active" id="panel-konversi" role="tabpanel">
+
+    <div class="card">
+      <div class="step-header">
+        <span class="step-badge">&#127807; Langkah 1</span>
+        <span class="step-title">Masukkan Teks / Kode</span>
+      </div>
+      <textarea id="k-input" placeholder="Ketik atau tempel teks di sini..."></textarea>
+      <div class="char-count" id="k-count">0 karakter</div>
+    </div>
+
+    <div class="card">
+      <div class="step-header">
+        <span class="step-badge">&#127806; Langkah 2</span>
+        <span class="step-title">Siram Tahap Pertumbuhan</span>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="pill-btn" onclick="quickConvert('text-to-binary')">
+          + &#127807; Ke Biner (Bahasa Mesin)
+        </button>
+        <button class="pill-btn" onclick="quickConvert('binary-to-text')">
+          + &#127806; Dari Biner &rarr; Teks
+        </button>
+        <button class="pill-btn" onclick="quickConvert('text-to-ascii')">
+          + &#127808; Ke Kode ASCII
+        </button>
+        <button class="pill-btn" onclick="quickConvert('ascii-to-text')">
+          + &#127809; Dari Kode ASCII &rarr; Teks
+        </button>
+        <button class="pill-btn" onclick="quickConvert('text-to-base64')">
+          + &#127810; Ke Base64
+        </button>
+        <button class="pill-btn" onclick="quickConvert('base64-to-text')">
+          + &#127811; Dari Base64 &rarr; Teks
+        </button>
+        <button class="pill-btn" onclick="quickConvert('text-to-hex')">
+          + &#128311; Ke Hex
+        </button>
+        <button class="pill-btn" onclick="quickConvert('hex-to-text')">
+          + &#128312; Dari Hex &rarr; Teks
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="select-row">
+        <label for="k-mode">Pilih konversi manual:</label>
+        <select id="k-mode">
+          <option value="text-to-binary">Teks &rarr; Biner</option>
+          <option value="binary-to-text">Biner &rarr; Teks</option>
+          <option value="text-to-hex">Teks &rarr; Hex</option>
+          <option value="hex-to-text">Hex &rarr; Teks</option>
+          <option value="text-to-base64">Teks &rarr; Base64</option>
+          <option value="base64-to-text">Base64 &rarr; Teks</option>
+          <option value="text-to-ascii">Teks &rarr; ASCII</option>
+          <option value="ascii-to-text">ASCII &rarr; Teks</option>
+        </select>
+        <button class="btn btn-primary" onclick="doConvert()">&#9654; Konversi</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step-header">
+        <span class="step-badge">&#127808; Langkah 3</span>
+        <span class="step-title">Lihat Hasil</span>
+      </div>
+      <textarea id="k-output" class="textarea-readonly" readonly placeholder="Hasil konversi akan muncul di sini..."></textarea>
+      <div class="char-count" id="k-out-count">0 karakter</div>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="copyOutput('k-output')">&#128203; Salin Hasil</button>
+        <button class="btn btn-secondary" onclick="swapInputOutput()">&#8645; Tukar Input &harr; Output</button>
+        <button class="btn btn-secondary" onclick="clearConvert()">&#128465; Bersihkan</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =================== TAB 2 — TERJEMAHAN =================== -->
+  <div class="tab-panel" id="panel-terjemah" role="tabpanel">
+
+    <div class="card">
+      <div class="step-header">
+        <span class="step-badge">&#127760; Terjemahan</span>
+        <span class="step-title">Terjemahkan Teks</span>
+      </div>
+
+      <div class="select-row">
+        <label for="t-src">Bahasa sumber:</label>
+        <select id="t-src">
+          <option value="auto">Otomatis (Deteksi)</option>
+          <option value="id">Indonesia</option>
+          <option value="en">Inggris</option>
+          <option value="jw">Jawa</option>
+          <option value="su">Sunda</option>
+          <option value="ms">Melayu</option>
+          <option value="ar">Arab</option>
+          <option value="zh-CN">Mandarin (Sederhana)</option>
+          <option value="ja">Jepang</option>
+          <option value="ko">Korea</option>
+          <option value="nl">Belanda</option>
+          <option value="de">Jerman</option>
+          <option value="fr">Prancis</option>
+          <option value="es">Spanyol</option>
+          <option value="ru">Rusia</option>
+          <option value="hi">Hindi</option>
+          <option value="th">Thai</option>
+        </select>
+
+        <span style="color:var(--text-muted);font-size:1.4rem;flex-shrink:0;">&rarr;</span>
+
+        <label for="t-dst">Bahasa tujuan:</label>
+        <select id="t-dst">
+          <option value="jw">Jawa</option>
+          <option value="id">Indonesia</option>
+          <option value="en">Inggris</option>
+          <option value="su">Sunda</option>
+          <option value="ms">Melayu</option>
+          <option value="ar">Arab</option>
+          <option value="zh-CN">Mandarin (Sederhana)</option>
+          <option value="ja">Jepang</option>
+          <option value="ko">Korea</option>
+          <option value="nl">Belanda</option>
+          <option value="de">Jerman</option>
+          <option value="fr">Prancis</option>
+          <option value="es">Spanyol</option>
+          <option value="ru">Rusia</option>
+          <option value="hi">Hindi</option>
+          <option value="th">Thai</option>
+        </select>
+      </div>
+
+      <textarea id="t-input" placeholder="Masukkan teks yang akan diterjemahkan (max 5000 karakter)..."></textarea>
+      <div class="char-count" id="t-count">0 / 5000 karakter</div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-translate" onclick="doTranslate()">
+          <span class="spinner" id="t-spinner"></span>
+          &#127760; Terjemahkan
+        </button>
+        <button class="btn btn-secondary" onclick="clearTranslate()">&#128465; Bersihkan</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Hasil Terjemahan</div>
+      <textarea id="t-output" class="textarea-readonly" readonly placeholder="Hasil terjemahan akan muncul di sini..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="copyOutput('t-output')">&#128203; Salin Hasil</button>
+      </div>
+      <p style="margin-top:14px;font-size:.78rem;color:var(--text-muted);font-family:'Inter',sans-serif;">
+        &#9888;&#65039; Terjemahan menggunakan MyMemory API (gratis, memerlukan koneksi internet).
+      </p>
+    </div>
+
+  </div>
+
+  <!-- =================== TAB 3 — AKSARA JAWA =================== -->
+  <div class="tab-panel" id="panel-aksara" role="tabpanel">
+
+    <div class="card">
+      <div class="card-title">&#9000; Papan Karakter Aksara Jawa (klik untuk menyisipkan)</div>
+
+      <div class="key-section">Konsonan (Ha Na Ca Ra Ka Da Ta Sa Wa La Pa Dha Ja Ya Nya Ma Ga Ba Tha Nga)</div>
+      <div class="keyboard-grid" id="key-consonants"></div>
+
+      <div class="key-section">Vokal Mandiri</div>
+      <div class="keyboard-grid" id="key-vowels"></div>
+
+      <div class="key-section">Sandhangan (Tanda Vokal &amp; Penutup)</div>
+      <div class="keyboard-grid" id="key-signs"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-header">
+        <span class="step-badge">&#128220; Input</span>
+        <span class="step-title">Aksara Jawa</span>
+      </div>
+      <textarea id="a-input" placeholder="Ketik aksara Jawa atau klik tombol di atas..." style="font-size:1.4rem;min-height:80px;line-height:2;"></textarea>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="doAksaraLatin()">&#9997;&#65039; Transliterasi ke Latin</button>
+        <button class="btn btn-teal" id="btn-aksara-indo" onclick="doAksaraIndo()">
+          <span class="spinner" id="a-spinner"></span>
+          &#127760; Terjemahkan ke Indonesia
+        </button>
+        <button class="btn btn-secondary" onclick="clearAksara()">&#128465; Bersihkan</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">&#9997;&#65039; Transliterasi Latin (Bahasa Jawa)</div>
+      <textarea id="a-latin" class="textarea-readonly" readonly placeholder="Hasil transliterasi..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="copyOutput('a-latin')">&#128203; Salin</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">&#127470;&#127465; Terjemahan Bahasa Indonesia</div>
+      <textarea id="a-indo" class="textarea-readonly" readonly placeholder="Terjemahan akan muncul di sini..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="copyOutput('a-indo')">&#128203; Salin</button>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<div id="status-bar">
+  <div id="status-dot"></div>
+  <span id="status-text">Siap.</span>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const setStatus = msg => { $('status-text').textContent = msg; };
+
+function showToast(msg, isError = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.style.borderColor = isError ? '#ff7b7b' : 'var(--green)';
+  t.style.color = isError ? '#ff7b7b' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function updateCount(inputId, countId, max) {
+  const len = $(inputId).value.length;
+  $(countId).textContent = max ? `${len} / ${max} karakter` : `${len} karakter`;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  $('tab-' + name).classList.add('active');
+  $('panel-' + name).classList.add('active');
+}
+
+function copyOutput(id) {
+  const val = $(id).value.trim();
+  if (!val) { showToast('Tidak ada hasil untuk disalin.', true); return; }
+  navigator.clipboard.writeText(val).then(() => showToast('Disalin ke clipboard!'));
+}
+
+/* ── CONVERSION LOGIC ─────────────────────────────────────── */
+
+function textToBinary(text) {
+  return Array.from(new TextEncoder().encode(text)).map(b => b.toString(2).padStart(8,'0')).join(' ');
+}
+
+function binaryToText(bin) {
+  const bits = bin.replace(/\s+/g, '');
+  if (!bits) throw new Error('Input biner kosong.');
+  if (/[^01]/.test(bits)) throw new Error('Biner hanya boleh berisi 0 dan 1.');
+  if (bits.length % 8 !== 0) throw new Error('Jumlah bit harus kelipatan 8.');
+  const bytes = [];
+  for (let i = 0; i < bits.length; i += 8) bytes.push(parseInt(bits.slice(i,i+8), 2));
+  return new TextDecoder().decode(new Uint8Array(bytes));
+}
+
+function textToHex(text) {
+  return Array.from(new TextEncoder().encode(text)).map(b => b.toString(16).toUpperCase().padStart(2,'0')).join(' ');
+}
+
+function hexToText(hex) {
+  const clean = hex.replace(/\s+/g, '');
+  if (!clean) throw new Error('Input hex kosong.');
+  if (!/^[0-9a-fA-F]+$/.test(clean)) throw new Error('Format hex tidak valid.');
+  if (clean.length % 2 !== 0) throw new Error('Panjang hex harus genap.');
+  const bytes = [];
+  for (let i = 0; i < clean.length; i += 2) bytes.push(parseInt(clean.slice(i,i+2), 16));
+  return new TextDecoder().decode(new Uint8Array(bytes));
+}
+
+function textToBase64(text) {
+  return btoa(unescape(encodeURIComponent(text)));
+}
+
+function base64ToText(b64) {
+  try { return decodeURIComponent(escape(atob(b64.trim()))); }
+  catch { throw new Error('Format Base64 tidak valid.'); }
+}
+
+function textToAscii(text) {
+  return Array.from(new TextEncoder().encode(text)).join(' ');
+}
+
+function asciiToText(ascii) {
+  const nums = ascii.trim().split(/\s+/);
+  if (nums.some(n => n === '' || isNaN(Number(n)))) throw new Error('Input ASCII tidak valid. Masukkan angka desimal dipisah spasi.');
+  return new TextDecoder().decode(new Uint8Array(nums.map(Number)));
+}
+
+const CONVERTERS = {
+  'text-to-binary':  textToBinary,
+  'binary-to-text':  binaryToText,
+  'text-to-hex':     textToHex,
+  'hex-to-text':     hexToText,
+  'text-to-base64':  textToBase64,
+  'base64-to-text':  base64ToText,
+  'text-to-ascii':   textToAscii,
+  'ascii-to-text':   asciiToText,
+};
+
+function runConvert(mode) {
+  const input = $('k-input').value;
+  if (!input.trim()) { showToast('Input tidak boleh kosong.', true); return; }
+  try {
+    const result = CONVERTERS[mode](input);
+    $('k-output').value = result;
+    updateCount('k-output','k-out-count');
+    const label = $('k-mode').querySelector('option[value="' + mode + '"]').textContent;
+    setStatus('Konversi berhasil: ' + label);
+    showToast('Konversi berhasil!');
+  } catch(e) {
+    showToast(e.message, true);
+    setStatus('Konversi gagal: ' + e.message);
+  }
+}
+
+function quickConvert(mode) {
+  $('k-mode').value = mode;
+  runConvert(mode);
+}
+
+function doConvert() { runConvert($('k-mode').value); }
+
+function swapInputOutput() {
+  const a = $('k-input').value;
+  const b = $('k-output').value;
+  $('k-input').value = b;
+  $('k-output').value = a;
+  updateCount('k-input','k-count');
+  updateCount('k-output','k-out-count');
+  showToast('Input & output ditukar.');
+}
+
+function clearConvert() {
+  $('k-input').value = '';
+  $('k-output').value = '';
+  updateCount('k-input','k-count');
+  updateCount('k-output','k-out-count');
+  setStatus('Siap.');
+}
+
+/* ── TRANSLATION ──────────────────────────────────────────── */
+
+async function googleTranslate(text, src, tgt) {
+  const params = new URLSearchParams({
+    q: text,
+    langpair: (src === 'auto' ? 'autodetect' : src) + '|' + tgt,
+  });
+  const res = await fetch('https://api.mymemory.translated.net/get?' + params);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if (data.responseStatus !== 200) throw new Error(data.responseDetails || 'Terjemahan gagal.');
+  return data.responseData.translatedText;
+}
+
+async function doTranslate() {
+  const text = $('t-input').value.trim();
+  if (!text) { showToast('Teks tidak boleh kosong.', true); return; }
+  if (text.length > 5000) { showToast('Teks terlalu panjang (max 5000).', true); return; }
+
+  $('btn-translate').disabled = true;
+  $('t-spinner').style.display = 'inline-block';
+  setStatus('Menerjemahkan...');
+
+  try {
+    const result = await googleTranslate(text, $('t-src').value, $('t-dst').value);
+    $('t-output').value = result;
+    const dstLabel = $('t-dst').selectedOptions[0].text;
+    setStatus('Terjemahan ke ' + dstLabel + ' berhasil.');
+    showToast('Terjemahan berhasil!');
+  } catch(e) {
+    showToast(e.message, true);
+    setStatus('Terjemahan gagal.');
+  } finally {
+    $('btn-translate').disabled = false;
+    $('t-spinner').style.display = 'none';
+  }
+}
+
+function clearTranslate() {
+  $('t-input').value = '';
+  $('t-output').value = '';
+  updateCount('t-input','t-count', 5000);
+  setStatus('Siap.');
+}
+
+/* ── AKSARA JAWA ──────────────────────────────────────────── */
+
+const JC = {0xA98F:"k",0xA990:"k",0xA991:"kh",0xA992:"g",0xA993:"gh",0xA994:"ng",0xA995:"c",0xA996:"ch",0xA997:"j",0xA998:"ny",0xA999:"jh",0xA99A:"ny",0xA99B:"th",0xA99C:"th",0xA99D:"dh",0xA99E:"dh",0xA99F:"n",0xA9A0:"t",0xA9A1:"t",0xA9A2:"d",0xA9A3:"dh",0xA9A4:"n",0xA9A5:"p",0xA9A6:"p",0xA9A7:"b",0xA9A8:"b",0xA9A9:"m",0xA9AA:"y",0xA9AB:"r",0xA9AC:"r",0xA9AD:"l",0xA9AE:"w",0xA9AF:"s",0xA9B0:"s",0xA9B1:"s",0xA9B2:"h"};
+const JIV = {0xA984:"a",0xA985:"i",0xA986:"i",0xA987:"i",0xA988:"u",0xA989:"re",0xA98A:"le",0xA98B:"le",0xA98C:"e",0xA98D:"ai",0xA98E:"o"};
+const JVS = {0xA9B4:"a",0xA9B5:"o",0xA9B6:"i",0xA9B7:"i",0xA9B8:"u",0xA9B9:"u",0xA9BA:"e",0xA9BB:"ai",0xA9BC:"e"};
+const JCS = {0xA980:"ng",0xA981:"ng",0xA982:"r",0xA983:"h"};
+const JDG = Object.fromEntries(Array.from({length:10},(_,i)=>[0xA9D0+i,String(i)]));
+const JPT = {0xA9C8:", ",0xA9C9:". "};
+const JIGN = new Set([...Array.from({length:7},(_,i)=>0xA9C1+i),...Array.from({length:5},(_,i)=>0xA9CA+i),0xA9DE,0xA9DF,0x200B,0x200C,0x200D,0xA9B3]);
+
+function isJavanese(text) {
+  return Array.from(text).some(c => { const cp = c.codePointAt(0); return cp >= 0xA980 && cp <= 0xA9DF; });
+}
+
+function aksaraToLatin(text) {
+  const out = [];
+  let cur = null;
+  const flush = () => { if (cur) { out.push(cur.onset + cur.vowel + cur.coda); cur = null; } };
+
+  for (const ch of text) {
+    const cp = ch.codePointAt(0);
+    if (JC[cp] !== undefined) {
+      flush(); cur = {onset:JC[cp], vowel:'a', coda:'', taling:false};
+    } else if (JIV[cp] !== undefined) {
+      flush(); cur = {onset:'', vowel:JIV[cp], coda:'', taling:false};
+    } else if (JVS[cp] !== undefined) {
+      if (cur && !cur.coda) {
+        if (cp === 0xA9B4 && cur.taling) cur.vowel = 'o';
+        else if (cp === 0xA9B4) cur.vowel = 'a';
+        else { cur.vowel = JVS[cp]; cur.taling = (cp === 0xA9BA); }
+      }
+    } else if (cp === 0xA9BE) { if (cur) cur.onset += 'y'; }
+    else if (cp === 0xA9BF) { if (cur) cur.onset += 'r'; }
+    else if (cp === 0xA9BD) { if (cur) { cur.onset += 'r'; cur.vowel = 'e'; } }
+    else if (cp === 0xA9C0) { if (cur) cur.vowel = ''; }
+    else if (JCS[cp] !== undefined) { if (cur) cur.coda += JCS[cp]; else out.push(JCS[cp]); }
+    else if (JDG[cp] !== undefined) { flush(); out.push(JDG[cp]); }
+    else if (JPT[cp] !== undefined) { flush(); out.push(JPT[cp]); }
+    else if (cp === 0xA9CF) { flush(); out.push('\uE000'); }
+    else if (JIGN.has(cp)) { /* skip */ }
+    else { flush(); out.push(ch); }
+  }
+  flush();
+  let res = out.join('');
+  res = res.replace(/(\w+)\uE000/g, '$1-$1');
+  return res.replace(/\uE000/g, '');
+}
+
+function doAksaraLatin() {
+  const src = $('a-input').value.trim();
+  if (!src) { showToast('Input aksara Jawa kosong.', true); return; }
+  if (!isJavanese(src)) { showToast('Teks tidak mengandung aksara Jawa.', true); return; }
+  $('a-latin').value = aksaraToLatin(src);
+  $('a-indo').value = '';
+  setStatus('Transliterasi ke Latin berhasil.');
+  showToast('Transliterasi berhasil!');
+}
+
+async function doAksaraIndo() {
+  const src = $('a-input').value.trim();
+  if (!src) { showToast('Input aksara Jawa kosong.', true); return; }
+  if (!isJavanese(src)) { showToast('Teks tidak mengandung aksara Jawa.', true); return; }
+
+  const latin = aksaraToLatin(src);
+  $('a-latin').value = latin;
+
+  $('btn-aksara-indo').disabled = true;
+  $('a-spinner').style.display = 'inline-block';
+  setStatus('Menerjemahkan ke Bahasa Indonesia...');
+
+  try {
+    const result = await googleTranslate(latin, 'jw', 'id');
+    $('a-indo').value = result;
+    setStatus('Aksara Jawa berhasil diterjemahkan ke Bahasa Indonesia.');
+    showToast('Terjemahan berhasil!');
+  } catch(e) {
+    showToast(e.message, true);
+    setStatus('Terjemahan gagal.');
+  } finally {
+    $('btn-aksara-indo').disabled = false;
+    $('a-spinner').style.display = 'none';
+  }
+}
+
+function clearAksara() {
+  $('a-input').value = '';
+  $('a-latin').value = '';
+  $('a-indo').value = '';
+  setStatus('Siap.');
+}
+
+/* ── Aksara Keyboard ──────────────────────────────────────── */
+
+const PAL_CONSONANTS = [0xA9B2,0xA9A4,0xA995,0xA9AB,0xA98F,0xA9A2,0xA9A0,0xA9B1,0xA9AE,0xA9AD,0xA9A5,0xA99D,0xA997,0xA9AA,0xA99A,0xA9A9,0xA992,0xA9A7,0xA99B,0xA994];
+const PAL_VOWELS = [0xA984,0xA986,0xA988,0xA98C,0xA98E];
+const PAL_SIGNS  = [0xA9B6,0xA9B8,0xA9BA,0xA9B4,0xA9BC,0xA9BE,0xA9BF,0xA981,0xA982,0xA983,0xA9C0];
+
+function buildKeyboard() {
+  const input = $('a-input');
+  function makeBtn(cp, isSign) {
+    const b = document.createElement('button');
+    b.className = 'key-btn' + (isSign ? ' sign' : '');
+    b.textContent = (isSign ? '\u25CC' : '') + String.fromCodePoint(cp);
+    b.title = 'U+' + cp.toString(16).toUpperCase();
+    b.addEventListener('click', () => {
+      const s = input.selectionStart, e = input.selectionEnd;
+      input.value = input.value.slice(0,s) + String.fromCodePoint(cp) + input.value.slice(e);
+      input.setSelectionRange(s+1,s+1);
+      input.focus();
+    });
+    return b;
+  }
+  PAL_CONSONANTS.forEach(cp => $('key-consonants').appendChild(makeBtn(cp, false)));
+  PAL_VOWELS.forEach(cp   => $('key-vowels').appendChild(makeBtn(cp, false)));
+  PAL_SIGNS.forEach(cp    => $('key-signs').appendChild(makeBtn(cp, true)));
+}
+
+/* ── Event Listeners ─────────────────────────────────────── */
+
+$('k-input').addEventListener('input', () => updateCount('k-input','k-count'));
+$('t-input').addEventListener('input', () => updateCount('t-input','t-count', 5000));
+
+buildKeyboard();
+</script>
+</body>
+</html>
